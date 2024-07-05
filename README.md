@@ -4,20 +4,32 @@
 - 主机 Ryzen 7 5800X, RTX 3090. OS: Ubuntu 20.04
 - 图片使用双目相机在室内环境拍摄，经opencv标定并矫正，原生分辨率2592x1520
 ## 测试的模型
+### Unimatch
+- GMStereo-scale2-regrefine3-resumeflowthings-mixdata: [768,1024] 0.82s
+  - 物体细节清晰
+  - 地板的视差会按倒影内容生成
+- scale1-sceneflow: [768,1024] 0.41s
+  - 相对于`scale2-regrefine3`, 物体边缘细节出现更多的模糊
+- 小分辨率下 [512,384] 视差图出现马赛克状分块  
+- 未矫正的图片也能给出一定结果
 ### CREStereo
 - 使用模型默认尺寸1024x1536，单次推理耗时约1.58s。
 - 总体匹配效果很好，远近物体边缘清晰，视差符合实际情况
 - 植物叶子具有清晰结构和边缘
 - 墙面边缘和凸出物清晰
-- 只出现在左侧图片中的近处物体（位于画面左侧下方）会使得同列的其他区域结果错误
-- 一部分的地砖（黑色，有一定反光，存在倒影）视差错误（比实际小）
-- 使用未矫正的图片也能给出大部分一致的结果
-### Unimatch
-- scale1-sceneflow: [768,1024] 0.41s,
-- GMStereo-scale2-regrefine3-resumeflowthings-mixdata: [768,1024] 0.82s,
-
+- 一部分的地砖（黑色，有一定反光，存在倒影）视差错误（小于实际）
+- 未矫正的图片也能给出一定结果
+### NMRF
+- 视差上限192, sceneflow.pth [1296,760] 1.05s, [512,384] 0.93s,
+- 物体细节清晰
+- 地砖视差会按倒影内容生成  
+### OpenStereo
+- 视差上限192
+- LightStereo-S-SceneFlow.ckpt [544,960] 0.91s
+  - 部分物体大面积错误，平整的物体表面视差却不平整
+  - 叶子形状模糊或丢失
 ### BGNet
-- 视差似乎有上限190左右。缩放图片至648x380/1296x760，单次推理约0.23s
+- 视差上限192。缩放图片至648x380/1296x760，单次推理约0.23s
 - 648x380下
   - 视差较小的远处物体基本全部丢失
   - 植物结构和叶子边缘形状丢失
@@ -45,8 +57,16 @@
 - 国际象棋标定板的每个相邻格子的视差都不同
 ### HITNet
 - 使用hitnet_sf_finalpass.ckpt,width=1280，单次推理约0.22s
-- 存在与TemporalStereo同样的问题，物体表面的错误部分更多且误差更大（约为2、3倍）
+- 存在与TemporalStereo同样的问题，物体表面的错误部分更多且误差更大
+### MObileStereoNet
+- 2D/[288, 512] 单次推理1.27s 
+- 没有物体细节
+### Temporally Consistent Stereo Matching
+- [960,544] 1.1s
+### Selective Stereo
+- Selective-IGEV `sceneflow.path`[960,544] 1.34s
 ### Parameterized Cost Volume for Stereo Matching
 显存要求25g，跑不了
-
+### AnyNet
+代码不可用
 
